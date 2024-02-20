@@ -7,5 +7,5 @@ blur_list = [0, 1, 2, 3, 4, 5]
 distortion_level_dict = {"blur": blur_list, "noise": noise_list}
 
 
-dataset_path = os.path.join(DIR_PATH, "undistorted_datasets", "256_ObjectCategories")
+dataset_path = os.path.join(DIR_PATH, "undistorted_datasets", "caltech256")
 distorted_dataset_path = os.path.join(DIR_PATH, "distorted_dataset", "caltech256")
