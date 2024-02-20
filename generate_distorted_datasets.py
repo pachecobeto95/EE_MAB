@@ -44,14 +44,12 @@ def generate_distorted_dataset(dataset_path, dist_type, dist_lvl, distorted_path
 
 def main(args):
 
-	distortion_level_dict = {"blur": config.blur_list, "noise": config.noise_list}
-
 	distortion_levels = config.distortion_level_dict[args.distortion_type]
 
 	for distortion_lvl in tqdm(distortion_levels):
 		print("Distortion Level: %s"%(distortion_lvl))
 		
-		distorted_path = os.path.join(distorted_path, distortion_type, str(distortion_lvl))
+		distorted_path = os.path.join(config.distorted_dataset_path, distortion_type, str(distortion_lvl))
 		os.makedirs(distorted_path, exist_ok=True)
 		generate_distorted_dataset(config.dataset_path, args.distortion_type, 
 			distortion_lvl, config.distorted_path)
