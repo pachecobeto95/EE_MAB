@@ -49,7 +49,7 @@ def main(args):
 	for distortion_lvl in tqdm(distortion_levels):
 		print("Distortion Level: %s"%(distortion_lvl))
 		
-		distorted_path = os.path.join(config.distorted_dataset_path, distortion_type, str(distortion_lvl))
+		distorted_path = os.path.join(config.distorted_dataset_path, args.distortion_type, str(distortion_lvl))
 		os.makedirs(distorted_path, exist_ok=True)
 		generate_distorted_dataset(config.dataset_path, args.distortion_type, 
 			distortion_lvl, config.distorted_path)
