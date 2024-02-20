@@ -42,9 +42,9 @@ def generate_distorted_dataset(dataset_path, dist_type, dist_lvl, distorted_path
 					processor.apply(imgPath)
 					processor.save_distorted_image(distorted_imgPath)
 
-		        except cv2.error as e:
-		        	print("error")
-		        	pass
+				except cv2.error as e:
+					print("error")
+					pass
 
 
 def main(args):
