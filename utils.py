@@ -81,6 +81,7 @@ def load_caltech256(args, dataset_path, indices_path):
 
 	train_idx, val_idx, test_idx = get_indices(train_set, args.split_ratio)
 
+	print(train_idx)
 
 	train_data = torch.utils.data.Subset(train_set, indices=train_idx)
 	val_data = torch.utils.data.Subset(val_set, indices=val_idx)
