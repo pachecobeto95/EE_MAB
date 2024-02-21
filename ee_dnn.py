@@ -98,6 +98,9 @@ class Early_Exit_DNN(nn.Module):
 
 		architecture_dnn_model_dict = {"mobilenet": self.early_exit_mobilenet}
 
+		#self.pool_size = 7 if (self.model_name == "vgg16") else 1
+		self.pool_size = 1
+
 		return architecture_dnn_model_dict.get(self.model_name, self.invalid_model)
 
 	def invalid_model(self):
