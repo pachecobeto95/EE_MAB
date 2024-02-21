@@ -1,6 +1,7 @@
 import cv2, config
 from torchvision import datasets, transforms
-import torch, os, sys, requests, early_exit_dnn, b_mobilenet, ee_nn
+import torch, os, sys, requests
+#import early_exit_dnn, b_mobilenet, ee_nn
 import numpy as np
 
 
