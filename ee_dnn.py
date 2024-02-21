@@ -256,7 +256,7 @@ class Early_Exit_DNN(nn.Module):
 		x (tensor): input image
 		"""
 
-		conf_list, class_list, inf_time_list  = [], [], []
+		output_list, conf_list, class_list, inf_time_list  = [], [], [], []
 		starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
 
 		cumulative_inf_time = 0.0
@@ -283,7 +283,7 @@ class Early_Exit_DNN(nn.Module):
 			curr_time = starter.elapsed_time(ender)
 
 			#This apprends the gathered confidences and classifications into a list
-			conf_list.append(conf_branch), class_list.append(prediction), inf_time_list.append(curr_time)
+			output_list.append(output_branch), conf_list.append(conf_branch), class_list.append(prediction), inf_time_list.append(curr_time)
 
 		#This measures the processing time for the last piece of DNN backbone
 		starter.record()
@@ -303,10 +303,11 @@ class Early_Exit_DNN(nn.Module):
 		curr_time = starter.elapsed_time(ender)
 
 
+		output_list.append(output)
 		conf_list.append(infered_conf), class_list.append(infered_class), inf_time_list.append(curr_time)
 
 		cumulative_inf_time_list = np.cumsum(inf_time_list)
 
-		return conf_list, class_list, inf_time_list, cumulative_inf_time_list
+		return output_list, conf_list, class_list, inf_time_list, cumulative_inf_time_list
 
 
