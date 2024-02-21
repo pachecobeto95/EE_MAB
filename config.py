@@ -23,3 +23,4 @@ exit_type = "bnpool"
 distribution = "linear"
 pretrained = True
 max_patience = 20
+weight_decay = 0.0005

@@ -1,5 +1,110 @@
 import config, utils
 import argparse, logging, os, torch
+from tqdm import tqdm
+import numpy as np
+
+
+def compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights):
+	model_loss = 0
+	ee_loss, acc_branches = [], []
+
+	for i, (output, inf_class, weight) in enumerate(zip(output_list, class_list, loss_weights), 1):
+		loss_branch = criterion(output, target)
+		model_loss += weight*loss_branch
+
+		acc_branch = 100*inf_class.eq(target.view_as(inf_class)).sum().item()/target.size(0)
+
+		ee_loss.append(loss_branch.item()), acc_branches.append(acc_branch)
+
+	acc_model = np.mean(np.array(acc_branches))
+
+	return model_loss, ee_loss, acc_model, acc_branches
+
+
+def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights):
+
+	model_loss_list, ee_loss_list = [], []
+	model_acc_list, ee_acc_list = [], []
+
+	model.train()
+
+	for (data, target) in tqdm(train_loader):
+		data, target = data.to(device), target.to(device)
+
+		output_list, conf_list, class_list = model.forward_training(data)
+		optimizer.zero_grad()
+
+		model_loss, ee_loss	= compute_loss()	
+
+		model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
+
+		model_loss_list.append(float(model_loss.item())), ee_loss_list.append(ee_loss)
+
+		model_acc_list.append(model_acc), ee_acc_list.append(ee_acc)
+
+		model_loss.backward()
+		optimizer.step()
+
+		# clear variables
+		del data, target, output_list, conf_list, class_list
+		torch.cuda.empty_cache()
+
+
+	avg_loss, avg_ee_loss = round(np.mean(model_loss_list), 4), np.mean(ee_loss_list, axis=0)
+
+	avg_acc, avg_ee_acc = round(np.mean(model_acc_list), 2), np.mean(ee_acc_list, axis=0)
+
+	#logging.debug("Epoch: %s, Train Model Loss: %s, Train Model Acc: %s"%(epoch, avg_loss, avg_acc))
+	print("Epoch: %s, Train Model Loss: %s, Train Model Acc: %s"%(epoch, avg_loss, avg_acc))
+
+	result_dict = {"epoch": epoch, "train_loss": avg_loss, "train_acc": avg_acc}
+
+	for i in range(n_exits):
+		result_dict.update({"train_ee_acc_%s"%(i+1): avg_ee_acc[i], "train_ee_loss_%s"%(i+1): avg_ee_loss[i]})
+		logging.debug("Epoch: %s, Train Loss EE %s: %s, Train Acc EE %s: %s"%(epoch, i, avg_ee_loss[i], i, avg_ee_acc[i]))
+		print("Epoch: %s, Train Loss EE %s: %s, Train Acc EE %s: %s"%(epoch, i, avg_ee_loss[i], i, avg_ee_acc[i]))
+
+	return result_dict
+
+
+def evalEEDNNs(model, val_loader, criterion, n_exits, epoch, device, loss_weights):
+
+	model_loss_list, ee_loss_list = [], []
+	model_acc_list, ee_acc_list = [], []
+
+	model.eval()
+
+	with torch.no_grad():
+		for (data, target) in tqdm(val_loader):
+			data, target = data.to(device), target.to(device)
+
+			output_list, conf_list, class_list = model.forwardTraining(data)
+
+			model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
+
+			model_loss_list.append(float(model_loss.item())), ee_loss_list.append(ee_loss)
+			model_acc_list.append(model_acc), ee_acc_list.append(ee_acc)
+
+			# clear variables
+			del data, target, output_list, conf_list, class_list
+			torch.cuda.empty_cache()
+
+	avg_loss, avg_ee_loss = round(np.mean(model_loss_list), 4), np.mean(ee_loss_list, axis=0)
+
+	avg_acc, avg_ee_acc = round(np.mean(model_acc_list), 2), np.mean(ee_acc_list, axis=0)
+
+	logging.debug("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
+	#print("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
+
+	result_dict = {"epoch": epoch, "val_loss": avg_loss, "val_acc": avg_acc}
+
+	for i in range(n_exits):
+		result_dict.update({"val_ee_acc_%s"%(i+1): avg_ee_acc[i], "val_ee_loss_%s"%(i+1): avg_ee_loss[i]})
+		#logging.debug("Epoch: %s, Val Loss EE %s: %s, Val Acc EE %s: %s"%(epoch, i, avg_ee_loss[i], i, avg_ee_acc[i]))
+		print("Epoch: %s, Val Loss EE %s: %s, Val Acc EE %s: %s"%(epoch, i, avg_ee_loss[i], i, avg_ee_acc[i]))
+
+	return result_dict
+
 
 
 def main(args):
@@ -22,6 +127,64 @@ def main(args):
 	device = torch.device('cuda' if (torch.cuda.is_available()) else 'cpu')
 
 	train_loader, val_loader, test_loader = utils.load_caltech256(args, config.dataset_path, indices_path)
+
+	n_classes = 257
+
+	loss_weights_dict = {"crescent": np.linspace(0.3, 1, args.n_branches+1), 
+	"decrescent": np.linspace(1, 0.3, args.n_branches+1), "equal": np.ones(args.n_branches+1)}
+	
+	loss_weights = loss_weights_dict[args.loss_weights_type]
+
+	current_result = {"exit_type": args.exit_type, "distribution": args.distribution, "n_classes": n_classes,
+	"input_dim": args.dim, "loss_weights_type": args.loss_weights_type}
+
+	#Instantiate the Early-exit DNN model.
+	ee_model = ee_dnn.Early_Exit_DNN(args.model_name, n_classes, args.pretrained, args.n_branches, 
+		args.dim, device, args.exit_type, args.distribution)
+	#Load the trained early-exit DNN model.
+	ee_model = ee_model.to(device)
+
+	lr = [1.5e-4, 0.01]
+
+	criterion = nn.CrossEntropyLoss()
+
+	optimizer = optim.Adam([{'params': ee_model.stages.parameters(), 'lr': lr[0]}, 
+		{'params': ee_model.exits.parameters(), 'lr': lr[1]},
+		{'params': ee_model.classifier.parameters(), 'lr': lr[0]}], weight_decay=weight_decay)
+
+	#scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
+	n_exits = args.n_branches + 1
+
+	epoch, count_patience = 0, 0
+	best_val_loss = np.inf
+	df_history = pd.DataFrame()
+
+	while (count < args.max_patience):
+		count_patience += 1
+
+		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
+		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
+		#scheduler.step()
+
+		current_result.update(train_result), current_result.update(val_result)
+		df_history = df_history.append(pd.Series(current_result), ignore_index=True)
+		df_history.to_csv(history_path)
+
+		if (val_result["val_loss"] < best_val_loss):
+			save_dict  = {}	
+			best_val_loss = val_result["val_loss"]
+			count_patience = 0
+
+			save_dict.update(current_result)
+			save_dict.update({"model_state_dict": ee_model.state_dict(), "opt_state_dict": optimizer.state_dict()})
+			torch.save(save_dict, model_save_path)
+
+		else:
+			count_patience += 1
+			print("Current Patience: %s"%(count_patience))
+
+	print("Stop! Patience is finished")
+
 
 
 
@@ -72,8 +235,9 @@ if (__name__ == "__main__"):
 
 	parser.add_argument('--model_id', type=int, help='Model_id.')
 
-	#parser.add_argument('--loss_weights_type', type=str, help='loss_weights_type.')
+	parser.add_argument('--loss_weights_type', type=str, help='loss_weights_type.')
 
+	parser.add_argument('--weight_decay', type=int, default=config.weight_decay, help='Weight Decay.')
 
 	args = parser.parse_args()
 
