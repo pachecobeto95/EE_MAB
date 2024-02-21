@@ -83,7 +83,7 @@ class Early_Exit_DNN(nn.Module):
 		self.layers = nn.ModuleList()
 		self.stage_id += 1    
 
-		def set_device(self):
+	def set_device(self):
 		"""
 		This method sets the device that will run the DNN model.
 		"""
