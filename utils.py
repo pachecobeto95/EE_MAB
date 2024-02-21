@@ -43,7 +43,7 @@ def get_indices(dataset, split_ratio):
 
 	train_val_idx, test_idx = indices[:train_val_size], indices[train_val_size:]
 
-	np.random.shuffle(train_val_idx)
+	#np.random.shuffle(train_val_idx)
 
 	train_size = len(train_val_idx) - int(np.floor(split_ratio * len(train_val_idx) ))
 
