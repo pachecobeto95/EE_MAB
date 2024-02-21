@@ -33,8 +33,11 @@ class ImageProcessor(object):
 def get_indices(dataset, split_ratio):
 	
 	nr_samples = len(dataset)
-	indices = list(range(nr_samples))
-	np.random.shuffle(indices)
+
+	#indices = list(range(nr_samples))
+	indices = list(torch.randperm(nr_samples).numpy())
+	
+	#np.random.shuffle(indices)
 
 	train_val_size = nr_samples - int(np.floor(split_ratio * nr_samples))
 
