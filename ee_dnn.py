@@ -250,7 +250,7 @@ class Early_Exit_DNN(nn.Module):
 		self.softmax = nn.Softmax(dim=1)
 
 
-	def forward_training(x):
+	def forward_training(self, x):
 		"""
 		This method runs the DNN model during the training phase.
 		x (tensor): input image
