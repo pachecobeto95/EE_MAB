@@ -54,6 +54,7 @@ def get_indices(dataset, split_ratio, indices_path):
 		save_indices(train_idx, val_idx, test_idx, indices_path)
 
 	else:
+		print("UHAUHA")
 		data_dict = torch.load(indices_path)
 		train_idx, val_idx, test_idx = data_dict["train"], data_dict["val"], data_dict["test"]	
 
@@ -92,7 +93,7 @@ def load_caltech256(args, dataset_path, indices_path):
 
 	train_idx, val_idx, test_idx = get_indices(train_set, args.split_ratio, indices_path)
 
-	print(train_idx)
+	#print(train_idx)
 
 	train_data = torch.utils.data.Subset(train_set, indices=train_idx)
 	val_data = torch.utils.data.Subset(val_set, indices=val_idx)
