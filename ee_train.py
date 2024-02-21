@@ -1,4 +1,4 @@
-import config, utils
+import config, utils, ee_dnn
 import argparse, logging, os, torch
 from tqdm import tqdm
 import numpy as np
