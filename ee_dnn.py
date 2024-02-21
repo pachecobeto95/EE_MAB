@@ -52,8 +52,7 @@ class Early_Exit_DNN(nn.Module):
 		This method selects the backbone to insert the early exits.
 		"""
 
-		architecture_dnn_model_dict = {"mobilenet": self.early_exit_mobilenet,
-		"resnet18": self.early_exit_resnet18}
+		architecture_dnn_model_dict = {"mobilenet": self.early_exit_mobilenet}
 
 		return architecture_dnn_model_dict.get(self.model_name, self.invalid_model)
 
