@@ -16,35 +16,35 @@ class Early_Exit_DNN(nn.Module):
 	def __init__(self, model_name: str, n_classes: int, 
 		pretrained: bool, n_branches: int, input_dim: int, 
 		exit_type: str, device, distribution="linear"):
-	super(Early_Exit_DNN, self).__init__()
+		super(Early_Exit_DNN, self).__init__()
 
-	"""
-	This class receives an DNN architecture name and inserts early-exit DNNs. 
-	Args:
+		"""
+		This class receives an DNN architecture name and inserts early-exit DNNs. 
+		Args:
 
-	model_name: model name 
-	n_classes: number of classes in a classification problem, according to the dataset
-	pretrained: 
-	n_branches: number of branches (early exits) inserted into middle layers
-	input_dim: dimension of the input image
-	exit_type: type of the exits
-	distribution: distribution method of the early exit blocks.
-	device: indicates if the model will processed in the cpu or in gpu
+		model_name: model name 
+		n_classes: number of classes in a classification problem, according to the dataset
+		pretrained: 
+		n_branches: number of branches (early exits) inserted into middle layers
+		input_dim: dimension of the input image
+		exit_type: type of the exits
+		distribution: distribution method of the early exit blocks.
+		device: indicates if the model will processed in the cpu or in gpu
 
-	Note: the term "backbone model" refers to a regular DNN model, considering no early exits.
+		Note: the term "backbone model" refers to a regular DNN model, considering no early exits.
 
-	"""
-	self.model_name = model_name
-	self.n_classes = n_classes
-	self.pretrained = pretrained
-	self.n_branches = n_branches
-	self.input_dim = input_dim
-	self.exit_type = exit_type
-	self.distribution = distribution
-	self.device = device
+		"""
+		self.model_name = model_name
+		self.n_classes = n_classes
+		self.pretrained = pretrained
+		self.n_branches = n_branches
+		self.input_dim = input_dim
+		self.exit_type = exit_type
+		self.distribution = distribution
+		self.device = device
 
-	build_early_exit_dnn = self.select_dnn_model()
-	build_early_exit_dnn()
+		build_early_exit_dnn = self.select_dnn_model()
+		build_early_exit_dnn()
 
 
 	def select_dnn_model(self):
