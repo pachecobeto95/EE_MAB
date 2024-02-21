@@ -4,6 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import torch.optim as optim
 import torch.nn as nn
+import pandas as pd
 
 def compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights):
 	model_loss = 0
