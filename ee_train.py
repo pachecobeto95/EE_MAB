@@ -162,7 +162,7 @@ def main(args):
 	best_val_loss = np.inf
 	df_history = pd.DataFrame()
 
-	while (count < args.max_patience):
+	while (count_patience < args.max_patience):
 		count_patience += 1
 
 		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
