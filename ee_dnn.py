@@ -283,7 +283,7 @@ class Early_Exit_DNN(nn.Module):
 			curr_time = starter.elapsed_time(ender)
 
 			#This apprends the gathered confidences and classifications into a list
-			conf_list.append(conf_branch.item()), class_list.append(prediction), inf_time_list.append(curr_time)
+			conf_list.append(conf_branch), class_list.append(prediction), inf_time_list.append(curr_time)
 
 		#This measures the processing time for the last piece of DNN backbone
 		starter.record()
