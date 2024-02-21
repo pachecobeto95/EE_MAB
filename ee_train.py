@@ -14,7 +14,7 @@ def main(args):
 
 	indices_path = os.path.join(config.DIR_PATH, "indices_%s.pt"%(args.dataset_name))
 
-	logPath = os.path.join(config.DIR_NAME, "log_train_ee_model_%s_%s_branches_id_%s.csv"%(args.model_name, args.n_branches, args.model_id))
+	logPath = os.path.join(config.DIR_PATH, "log_train_ee_model_%s_%s_branches_id_%s.csv"%(args.model_name, args.n_branches, args.model_id))
 
 	logging.basicConfig(level=logging.DEBUG, filename=logPath, filemode="a+", format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
