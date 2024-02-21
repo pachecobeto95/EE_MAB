@@ -30,24 +30,32 @@ class ImageProcessor(object):
 		cv2.imwrite(output_path, self.dist_img)
 
 
-def get_indices(dataset, split_ratio):
+def save_indices(train_idx, val_idx, test_idx, indices_path):
+
+	data_dict = {"train": train_idx, "val": val_idx, "test": test_idx}
+	torch.save(data_dict, indices_path)
+
+def get_indices(dataset, split_ratio, indices_path):
 	
-	nr_samples = len(dataset)
+	if (not os.path.exists(indices_path)):
 
-	#indices = list(range(nr_samples))
-	indices = list(torch.randperm(nr_samples).numpy())
-	
-	#np.random.shuffle(indices)
+		nr_samples = len(dataset)
 
-	train_val_size = nr_samples - int(np.floor(split_ratio * nr_samples))
+		indices = list(torch.randperm(nr_samples).numpy())	
 
-	train_val_idx, test_idx = indices[:train_val_size], indices[train_val_size:]
+		train_val_size = nr_samples - int(np.floor(split_ratio * nr_samples))
 
-	#np.random.shuffle(train_val_idx)
+		train_val_idx, test_idx = indices[:train_val_size], indices[train_val_size:]
 
-	train_size = len(train_val_idx) - int(np.floor(split_ratio * len(train_val_idx) ))
+		train_size = len(train_val_idx) - int(np.floor(split_ratio * len(train_val_idx) ))
 
-	train_idx, val_idx = train_val_idx[:train_size], train_val_idx[train_size:]
+		train_idx, val_idx = train_val_idx[:train_size], train_val_idx[train_size:]
+
+		save_indices(train_idx, val_idx, test_idx, indices_path)
+
+	else:
+		data_dict = torch.load(indices_path)
+		train_idx, val_idx, test_idx = data_dict["train"], data_dict["val"], data_dict["test"]	
 
 	return train_idx, val_idx, test_idx
 
@@ -82,7 +90,7 @@ def load_caltech256(args, dataset_path, indices_path):
 	val_set = datasets.ImageFolder(dataset_path, transform=transformations_test)
 	test_set = datasets.ImageFolder(dataset_path, transform=transformations_test)
 
-	train_idx, val_idx, test_idx = get_indices(train_set, args.split_ratio)
+	train_idx, val_idx, test_idx = get_indices(train_set, args.split_ratio, indices_path)
 
 	print(train_idx)
 
