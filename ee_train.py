@@ -33,10 +33,9 @@ def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, devic
 	for (data, target) in tqdm(train_loader):
 		data, target = data.to(device), target.to(device)
 
-		output_list, conf_list, class_list = model.forward_training(data)
+		output_list, conf_list, class_list, _, _ = model.forward_training(data)
 		optimizer.zero_grad()
 
-		model_loss, ee_loss	= compute_loss()	
 
 		model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
 
