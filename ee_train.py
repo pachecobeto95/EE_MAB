@@ -115,9 +115,11 @@ def main(args):
 
 	os.makedirs(models_dir_path, exist_ok=True), os.makedirs(history_dir_path, exist_ok=True)
 
-	model_save_path = os.path.join(models_dir_path, "ee_model_%s_%s_branches_id_%s.pth"%(args.model_name, args.n_branches, args.model_id))
+	model_save_path = os.path.join(models_dir_path, "ee_model_%s_%s_branches_%s_id_%s.pth"%(args.model_name, 
+		args.n_branches, args.loss_weights_type, args.model_id))
 
-	history_path = os.path.join(history_dir_path, "history_ee_model_%s_%s_branches_id_%s.csv"%(args.model_name, args.n_branches, args.model_id))
+	history_path = os.path.join(history_dir_path, "history_ee_model_%s_%s_branches_%s_id_%s.csv"%(args.model_name, 
+		args.n_branches, args.loss_weights_type, args.model_id))
 
 	indices_path = os.path.join(config.DIR_PATH, "indices_%s.pt"%(args.dataset_name))
 
@@ -162,7 +164,7 @@ def main(args):
 	df_history = pd.DataFrame()
 
 	while (count_patience < args.max_patience):
-		count_patience += 1
+		epoch += 1
 
 		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
