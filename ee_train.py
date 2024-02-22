@@ -81,7 +81,7 @@ def evalEEDNNs(model, val_loader, criterion, n_exits, epoch, device, loss_weight
 
 			output_list, conf_list, class_list = model.forwardTraining(data)
 
-			model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
+			model_loss, ee_loss, model_acc, ee_acc, _, _ = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
 
 			model_loss_list.append(float(model_loss.item())), ee_loss_list.append(ee_loss)
 			model_acc_list.append(model_acc), ee_acc_list.append(ee_acc)
