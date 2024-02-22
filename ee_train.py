@@ -169,7 +169,8 @@ def main(args):
 		#scheduler.step()
 
 		current_result.update(train_result), current_result.update(val_result)
-		df_history = df_history.append(pd.Series(current_result), ignore_index=True)
+		#df_history = df_history.append(pd.Series(current_result), ignore_index=True)
+		df_history = pd.concat([df_history, pd.DataFrame([current_result])], ignore_index=True)
 		df_history.to_csv(history_path)
 
 		if (val_result["val_loss"] < best_val_loss):
