@@ -94,8 +94,8 @@ def evalEEDNNs(model, val_loader, criterion, n_exits, epoch, device, loss_weight
 
 	avg_acc, avg_ee_acc = round(np.mean(model_acc_list), 2), np.mean(ee_acc_list, axis=0)
 
-	logging.debug("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
-	#print("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
+	#logging.debug("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
+	print("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
 
 	result_dict = {"epoch": epoch, "val_loss": avg_loss, "val_acc": avg_acc}
 
@@ -156,7 +156,7 @@ def main(args):
 		{'params': ee_model.exits.parameters(), 'lr': lr[1]},
 		{'params': ee_model.classifier.parameters(), 'lr': lr[0]}], weight_decay=args.weight_decay)
 
-	#scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
+	scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
 	n_exits = args.n_branches + 1
 
 	epoch, count_patience = 0, 0
@@ -168,7 +168,7 @@ def main(args):
 
 		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
-		#scheduler.step()
+		scheduler.step()
 
 		current_result.update(train_result), current_result.update(val_result)
 		#df_history = df_history.append(pd.Series(current_result), ignore_index=True)

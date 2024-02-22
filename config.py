@@ -11,10 +11,12 @@ distortion_level_dict = {"blur": blur_list, "noise": noise_list}
 dataset_path = os.path.join(DIR_PATH, "undistorted_datasets", "caltech256")
 distorted_dataset_path = os.path.join(DIR_PATH, "distorted_dataset", "caltech256")
 
+n_class_dict = {"caltech256": 257}
+
 
 dataset_name = "caltech256"
 model_name = "mobilenet"
-split_ratio = 0.2
+split_ratio = 0.1
 batch_size_train = 64
 batch_size_test = 1
 seed = 42                     # the answer to life the universe and everything
