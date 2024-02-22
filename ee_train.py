@@ -33,7 +33,7 @@ def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, devic
 	for (data, target) in tqdm(train_loader):
 		data, target = data.to(device), target.to(device)
 
-		output_list, conf_list, class_list, _, _ = model.forward_training(data)
+		output_list, conf_list, class_list, _, _ = model.forwardTraining(data)
 		optimizer.zero_grad()
 
 
