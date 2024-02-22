@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import pandas as pd
 import torchvision.models as models
+import torchvision.models.MobileNet_V2_Weights
 from pthflops import count_ops
 from torch import Tensor
 
