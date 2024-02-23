@@ -31,7 +31,7 @@ def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, devic
 
 	model.train()
 
-	for i, (data, target) in tqdm(enumerate(train_loader)):
+	for i, (data, target) in enumerate(tqdm(train_loader)):
 		data, target = data.to(device), target.to(device)
 
 
