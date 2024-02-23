@@ -185,7 +185,7 @@ def main(args):
 		start_factor=config.lr_warmup_decay, total_iters=config.lr_warmup_epochs)
 
 	lr_scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, 
-		schedulers=[warmup_lr_scheduler, main_lr_scheduler], milestones=[args.lr_warmup_epochs])
+		schedulers=[warmup_lr_scheduler, main_lr_scheduler], milestones=[config.lr_warmup_epochs])
 
 
 
