@@ -94,7 +94,7 @@ def load_caltech256(args, dataset_path, indices_path):
 
 
 	transformations_train = transforms.Compose([
-		transforms.RandomResizedCrop(train_crop_size, interpolation=interpolation, antialias=True),
+		transforms.RandomResizedCrop(config.train_crop_size, interpolation=interpolation, antialias=True),
 		transforms.RandomHorizontalFlip(p=config.hflip_prob),
 		transforms.TrivialAugmentWide(interpolation=interpolation),
 		transforms.ToTensor(),
