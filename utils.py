@@ -124,7 +124,7 @@ def load_caltech256(args, dataset_path, indices_path):
 	test_data = torch.utils.data.Subset(test_set, indices=test_idx)
 
 	train_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size_train, 
-		shuffle=True, num_workers=config.ngpus, pin_memory=True, collate_fn=collate_fn)
+		shuffle=True, num_workers=config.ngpus, pin_memory=True, collate_fn=default_collate)
 	val_loader = torch.utils.data.DataLoader(val_data, batch_size=1, num_workers=config.ngpus, 
 		pin_memory=True, collate_fn=default_collate)
 	test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, num_workers=config.ngpus, 
