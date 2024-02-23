@@ -108,8 +108,8 @@ def load_caltech256(args, dataset_path, indices_path):
 		transforms.Normalize(mean = mean, std = std),
 		])
 
-	mixup_cutmix = get_mixup_cutmix(
-		mixup_alpha=config.mixup_alpha, cutmix_alpha=config.cutmix_alpha, num_categories=257)
+	#mixup_cutmix = get_mixup_cutmix(
+	#	mixup_alpha=config.mixup_alpha, cutmix_alpha=config.cutmix_alpha, num_categories=257)
 
 
 	# This block receives the dataset path and applies the transformation data. 
