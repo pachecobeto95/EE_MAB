@@ -29,7 +29,7 @@ max_patience = 20
 #weight_decay = 0.0005
 
 weight_decay=2e-05 
-ngpus=8
+ngpus=6
 max_epochs=600 
 momentum=0.9
 lr=0.5
