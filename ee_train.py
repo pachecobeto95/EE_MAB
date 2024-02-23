@@ -40,7 +40,7 @@ def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, devic
 			model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
 
 		optimizer.zero_grad()
-		scaler.scale(loss).backward()
+		scaler.scale(model_loss).backward()
 
 		# we should unscale the gradients of optimizer's assigned params if do gradient clipping
 		scaler.unscale_(optimizer)
