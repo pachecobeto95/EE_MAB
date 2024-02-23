@@ -173,7 +173,7 @@ def main(args):
 		momentum=config.momentum, weight_decay=args.weight_decay)
 
 
-    scaler = torch.cuda.amp.GradScaler()
+	scaler = torch.cuda.amp.GradScaler()
 
 	#scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
 	
