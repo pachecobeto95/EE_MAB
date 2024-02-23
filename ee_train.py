@@ -24,28 +24,36 @@ def compute_metrics(criterion, output_list, conf_list, class_list, target, loss_
 	return model_loss, ee_loss, acc_model, acc_branches
 
 
-def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights):
+def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights, scaler):
 
 	model_loss_list, ee_loss_list = [], []
 	model_acc_list, ee_acc_list = [], []
 
 	model.train()
 
-	for (data, target) in tqdm(train_loader):
+	for i, (data, target) in tqdm(enumerate(train_loader)):
 		data, target = data.to(device), target.to(device)
 
-		output_list, conf_list, class_list, _, _ = model.forwardTraining(data)
+
+        with torch.cuda.amp.autocast(enabled=True):
+			output_list, conf_list, class_list, _, _ = model.forwardTraining(data)
+			model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
+
 		optimizer.zero_grad()
+		scaler.scale(loss).backward()
 
-
-		model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
+		# we should unscale the gradients of optimizer's assigned params if do gradient clipping
+		scaler.unscale_(optimizer)
+		nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad_norm)
+		scaler.step(optimizer)
+		scaler.update()
 
 		model_loss_list.append(float(model_loss.item())), ee_loss_list.append(ee_loss)
 
 		model_acc_list.append(model_acc), ee_acc_list.append(ee_acc)
 
-		model_loss.backward()
-		optimizer.step()
+		#model_loss.backward()
+		#optimizer.step()
 
 		# clear variables
 		del data, target, output_list, conf_list, class_list
@@ -151,25 +159,48 @@ def main(args):
 
 	lr = [1.5e-4, 0.01]
 
-	criterion = nn.CrossEntropyLoss()
+	#criterion = nn.CrossEntropyLoss()
+	criterion = nn.CrossEntropyLoss(label_smoothing=config.label_smoothing)
 
-	optimizer = optim.Adam([{'params': ee_model.stages.parameters(), 'lr': lr[0]}, 
-		{'params': ee_model.exits.parameters(), 'lr': lr[1]},
-		{'params': ee_model.classifier.parameters(), 'lr': lr[0]}], weight_decay=args.weight_decay)
+	#optimizer = optim.Adam([{'params': ee_model.stages.parameters(), 'lr': lr[0]}, 
+	#	{'params': ee_model.exits.parameters(), 'lr': lr[1]},
+	#	{'params': ee_model.classifier.parameters(), 'lr': lr[0]}], weight_decay=args.weight_decay)
 
-	scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
+
+	optimizer = optim.SGD([{'params': ee_model.stages.parameters(), 'lr': config.lr}, 
+		{'params': ee_model.exits.parameters(), 'lr': config.lr},
+		{'params': ee_model.classifier.parameters(), 'lr': config.lr}], 
+		momentum=config.momentum, weight_decay=args.weight_decay)
+
+
+    scaler = torch.cuda.amp.GradScaler()
+
+	#scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
+	
+	main_lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
+		T_max=config.max_epochs - config.lr_warmup_epochs, eta_min=config.lr_min)
+
+
+	warmup_lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 
+		start_factor=config.lr_warmup_decay, total_iters=config.lr_warmup_epochs)
+
+	lr_scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, 
+		schedulers=[warmup_lr_scheduler, main_lr_scheduler], milestones=[args.lr_warmup_epochs])
+
+
+
 	n_exits = args.n_branches + 1
-
 	epoch, count_patience = 0, 0
 	best_val_loss = np.inf
 	df_history = pd.DataFrame()
 
-	while (count_patience < args.max_patience):
+	#while (count_patience < args.max_patience):
+	while (epoch < config.max_epochs):
 		epoch += 1
 
-		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
+		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights, scaler)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
-		scheduler.step()
+		lr_scheduler.step()
 
 		current_result.update(train_result), current_result.update(val_result)
 		#df_history = df_history.append(pd.Series(current_result), ignore_index=True)
