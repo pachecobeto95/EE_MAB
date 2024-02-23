@@ -71,7 +71,7 @@ def load_caltech256(args, dataset_path, indices_path):
 
 	torch.manual_seed(args.seed)
 
-    interpolation = InterpolationMode(config.interpolation)
+	interpolation = InterpolationMode(config.interpolation)
 
 	#transformations_train = transforms.Compose([
 	#	transforms.Resize((args.input_dim, args.input_dim)),
