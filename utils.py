@@ -4,7 +4,7 @@ import torch, os, sys, requests
 #import early_exit_dnn, b_mobilenet, ee_nn
 import numpy as np
 from torchvision.transforms.functional import InterpolationMode
-from transforms import get_mixup_cutmix
+from torchvision.transforms import get_mixup_cutmix
 from torch.utils.data.dataloader import default_collate
 
 
