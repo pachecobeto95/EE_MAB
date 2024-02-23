@@ -4,7 +4,7 @@ import torch, os, sys, requests
 #import early_exit_dnn, b_mobilenet, ee_nn
 import numpy as np
 from torchvision.transforms.functional import InterpolationMode
-from torchvision.transforms import get_mixup_cutmix
+#from torchvision.transforms import get_mixup_cutmix
 from torch.utils.data.dataloader import default_collate
 
 
@@ -111,9 +111,6 @@ def load_caltech256(args, dataset_path, indices_path):
 	mixup_cutmix = get_mixup_cutmix(
 		mixup_alpha=config.mixup_alpha, cutmix_alpha=config.cutmix_alpha, num_categories=257)
 
-
-	def collate_fn(batch):
-		return mixup_cutmix(*default_collate(batch))
 
 	# This block receives the dataset path and applies the transformation data. 
 	train_set = datasets.ImageFolder(dataset_path, transform=transformations_train)
