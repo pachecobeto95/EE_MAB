@@ -52,10 +52,10 @@ ra_magnitude = 9
 # EMA configuration
 model_ema=True, 
 model_ema_steps=32, 
-model_ema_decay=0.99998, 
+model_ema_decay=0.99998
 
 # Resizing
-interpolation='bilinear', 
+interpolation='bilinear'
 val_resize_size=232, 
 val_crop_size=224, 
 train_crop_size=176
