@@ -7,9 +7,10 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import pandas as pd
-import torchvision.models as models
+#import torchvision.models as models
 from pthflops import count_ops
 from torch import Tensor
+import torchvision.prototype.models as models
 
 class EarlyExitBlock(nn.Module):
   """
@@ -222,7 +223,8 @@ class Early_Exit_DNN(nn.Module):
 		print(self.device)
     
 		# Loads the backbone model. In other words, Mobilenet architecture provided by Pytorch.
-		backbone_model = models.mobilenet_v2(self.pretrained, weights='DEFAULT').to(self.device)
+		#backbone_model = models.mobilenet_v2(self.pretrained, weights='DEFAULT').to(self.device)
+		backbone_model = models.mobilenet_v2(self.pretrained, weights=MobileNet_V2_Weights.DEFAULT).to(self.device)
 
 		# It verifies if the number of early exits provided is greater than a number of layers in the backbone DNN model.
 		self.verifies_nr_exits(backbone_model.features)
