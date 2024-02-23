@@ -35,7 +35,7 @@ def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, devic
 		data, target = data.to(device), target.to(device)
 
 
-        with torch.cuda.amp.autocast(enabled=True):
+		with torch.cuda.amp.autocast(enabled=True):
 			output_list, conf_list, class_list, _, _ = model.forwardTraining(data)
 			model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
 
