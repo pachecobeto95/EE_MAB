@@ -42,9 +42,6 @@ def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, devic
 		optimizer.zero_grad()
 		scaler.scale(model_loss).backward()
 
-		# we should unscale the gradients of optimizer's assigned params if do gradient clipping
-		scaler.unscale_(optimizer)
-		nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad_norm)
 		scaler.step(optimizer)
 		scaler.update()
 
