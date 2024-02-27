@@ -162,7 +162,7 @@ def main(args):
 	df_history = pd.DataFrame()
 
 	while (count_patience < args.max_patience):
-		count_patience += 1
+		epoch += 1
 
 		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
