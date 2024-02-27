@@ -24,7 +24,7 @@ def compute_metrics(criterion, output_list, conf_list, class_list, target, loss_
 	return model_loss, ee_loss, acc_model, acc_branches
 
 
-def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights, scaler):
+def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights):
 
 	model_loss_list, ee_loss_list = [], []
 	model_acc_list, ee_acc_list = [], []
@@ -185,7 +185,7 @@ def main(args):
 	#while (epoch < config.max_epochs):
 		epoch += 1
 
-		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights, scaler)
+		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
 		main_lr_scheduler.step()
 
