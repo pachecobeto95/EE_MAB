@@ -155,26 +155,18 @@ def main(args):
 
 	lr = [1.5e-4, 0.01]
 
-	#criterion = nn.CrossEntropyLoss()
-	criterion = nn.CrossEntropyLoss(label_smoothing=config.label_smoothing)
+	criterion = nn.CrossEntropyLoss()
+	#criterion = nn.CrossEntropyLoss(label_smoothing=config.label_smoothing)
 
 	optimizer = optim.Adam([{'params': ee_model.stages.parameters(), 'lr': lr[0]}, 
 		{'params': ee_model.exits.parameters(), 'lr': lr[1]},
 		{'params': ee_model.classifier.parameters(), 'lr': lr[0]}], weight_decay=args.weight_decay)
 
 
-	#optimizer = optim.SGD([{'params': ee_model.stages.parameters(), 'lr': config.lr}, 
-	#	{'params': ee_model.exits.parameters(), 'lr': config.lr},
-	#	{'params': ee_model.classifier.parameters(), 'lr': config.lr}], 
-	#	momentum=config.momentum, weight_decay=args.weight_decay)
-
-
-	scaler = torch.cuda.amp.GradScaler()
-
-	#scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
+	main_lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
 	
-	main_lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
-		T_max=config.max_epochs - config.lr_warmup_epochs, eta_min=config.lr_min)
+	#main_lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
+	#	T_max=config.max_epochs - config.lr_warmup_epochs, eta_min=config.lr_min)
 
 
 	#warmup_lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 

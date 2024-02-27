@@ -225,7 +225,7 @@ class Early_Exit_DNN(nn.Module):
 		last_channel = 1280
     
 		# Loads the backbone model. In other words, Mobilenet architecture provided by Pytorch.
-		backbone_model = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.DEFAULT).to(self.device)
+		backbone_model = models.mobilenet_v2(pretrained=True).to(self.device)
 		#backbone_model = PM.mobilenet(self.pretrained).to(self.device)
 
 		# It verifies if the number of early exits provided is greater than a number of layers in the backbone DNN model.
