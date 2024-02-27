@@ -155,6 +155,9 @@ def main(args):
 		{'params': ee_model.classifier.parameters(), 'lr': lr[0]}], weight_decay=args.weight_decay)
 
 	#scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
+	scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
+		T_max=config.max_epochs - config.lr_warmup_epochs, eta_min=config.lr_min)
+
 	n_exits = args.n_branches + 1
 
 	epoch, count_patience = 0, 0
@@ -166,7 +169,7 @@ def main(args):
 
 		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
-		#scheduler.step()
+		scheduler.step()
 
 		current_result.update(train_result), current_result.update(val_result)
 		#df_history = df_history.append(pd.Series(current_result), ignore_index=True)
