@@ -73,40 +73,40 @@ def load_caltech256(args, dataset_path, indices_path):
 
 	interpolation = InterpolationMode(config.interpolation)
 
-	#transformations_train = transforms.Compose([
-	#	transforms.Resize((args.input_dim, args.input_dim)),
-	#	transforms.RandomChoice([
-	#		transforms.ColorJitter(brightness=(0.80, 1.20)),
-	#		transforms.RandomGrayscale(p = 0.25)]),
-	#	transforms.CenterCrop((config.train_crop_size, config.train_crop_size)),
-	#	transforms.RandomHorizontalFlip(p=0.25),
-	#	transforms.RandomRotation(25),
-	#	transforms.ToTensor(), 
-	#	transforms.Normalize(mean = mean, std = std),
-	#	])
-
-	#transformations_test = transforms.Compose([
-	#	transforms.Resize((args.input_dim, args.input_dim)),
-	#	transforms.CenterCrop((args.dim, args.dim)),
-	#	transforms.ToTensor(), 
-	#	transforms.Normalize(mean = mean, std = std),
-	#	])
-
-
 	transformations_train = transforms.Compose([
-		transforms.RandomResizedCrop(config.train_crop_size, interpolation=interpolation, antialias=True),
-		transforms.RandomHorizontalFlip(p=config.hflip_prob),
-		transforms.TrivialAugmentWide(interpolation=interpolation),
-		transforms.ToTensor(),
-		transforms.Normalize(mean = mean, std = std),
-		transforms.RandomErasing(p=config.random_erase)])
-
-	transformations_test = transforms.Compose([
-		transforms.Resize((config.val_resize_size, config.val_resize_size)),
-		transforms.CenterCrop((config.val_crop_size, config.val_crop_size)),
+		transforms.Resize((args.input_dim, args.input_dim)),
+		transforms.RandomChoice([
+			transforms.ColorJitter(brightness=(0.80, 1.20)),
+			transforms.RandomGrayscale(p = 0.25)]),
+		transforms.CenterCrop((config.train_crop_size, config.train_crop_size)),
+		transforms.RandomHorizontalFlip(p=0.5),
+		transforms.RandomRotation(25),
 		transforms.ToTensor(), 
 		transforms.Normalize(mean = mean, std = std),
 		])
+
+	transformations_test = transforms.Compose([
+		transforms.Resize((args.input_dim, args.input_dim)),
+		transforms.CenterCrop((args.dim, args.dim)),
+		transforms.ToTensor(), 
+		transforms.Normalize(mean = mean, std = std),
+		])
+
+
+	#transformations_train = transforms.Compose([
+	#	transforms.RandomResizedCrop(config.train_crop_size, interpolation=interpolation, antialias=True),
+	#	transforms.RandomHorizontalFlip(p=config.hflip_prob),
+	#	transforms.TrivialAugmentWide(interpolation=interpolation),
+	#	transforms.ToTensor(),
+	#	transforms.Normalize(mean = mean, std = std),
+	#	transforms.RandomErasing(p=config.random_erase)])
+
+	#transformations_test = transforms.Compose([
+	#	transforms.Resize((config.val_resize_size, config.val_resize_size)),
+	#	transforms.CenterCrop((config.val_crop_size, config.val_crop_size)),
+	#	transforms.ToTensor(), 
+	#	transforms.Normalize(mean = mean, std = std),
+	#	])
 
 	#mixup_cutmix = get_mixup_cutmix(
 	#	mixup_alpha=config.mixup_alpha, cutmix_alpha=config.cutmix_alpha, num_categories=257)

@@ -177,12 +177,11 @@ def main(args):
 		T_max=config.max_epochs - config.lr_warmup_epochs, eta_min=config.lr_min)
 
 
-	warmup_lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 
-		start_factor=config.lr_warmup_decay, total_iters=config.lr_warmup_epochs)
+	#warmup_lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 
+	#	start_factor=config.lr_warmup_decay, total_iters=config.lr_warmup_epochs)
 
-	lr_scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, 
-		schedulers=[warmup_lr_scheduler, main_lr_scheduler], milestones=[config.lr_warmup_epochs])
-
+	#lr_scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, 
+	#	schedulers=[warmup_lr_scheduler, main_lr_scheduler], milestones=[config.lr_warmup_epochs])
 
 
 	n_exits = args.n_branches + 1
@@ -196,7 +195,7 @@ def main(args):
 
 		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights, scaler)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
-		lr_scheduler.step()
+		main_lr_scheduler.step()
 
 		current_result.update(train_result), current_result.update(val_result)
 		#df_history = df_history.append(pd.Series(current_result), ignore_index=True)
