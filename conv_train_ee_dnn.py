@@ -6,7 +6,6 @@ import torch.optim as optim
 import torch.nn as nn
 import pandas as pd
 
-
 def compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights):
 	model_loss = 0
 	ee_loss, acc_branches = [], []
@@ -31,18 +30,14 @@ def trainEEDNNs(model, train_loader, optimizer, criterion, n_exits, epoch, devic
 
 	model.train()
 
-	for i, (data, target) in enumerate(tqdm(train_loader)):
+	for (data, target) in tqdm(train_loader):
 		data, target = data.to(device), target.to(device)
 
-
-		output_list, conf_list, class_list, _, _ = model.forwardTraining(data)
-		model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
-
+		output_list, conf_list, class_list, _, _ = model.forward_training(data)
 		optimizer.zero_grad()
-		#scaler.scale(model_loss).backward()
 
-		#scaler.step(optimizer)
-		#scaler.update()
+
+		model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
 
 		model_loss_list.append(float(model_loss.item())), ee_loss_list.append(ee_loss)
 
@@ -84,9 +79,9 @@ def evalEEDNNs(model, val_loader, criterion, n_exits, epoch, device, loss_weight
 		for (data, target) in tqdm(val_loader):
 			data, target = data.to(device), target.to(device)
 
-			output_list, conf_list, class_list, _, _ = model.forwardTraining(data)
+			output_list, conf_list, class_list = model.forwardTraining(data)
 
-			model_loss, ee_loss, model_acc, ee_acc = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
+			model_loss, ee_loss, model_acc, ee_acc, _, _ = compute_metrics(criterion, output_list, conf_list, class_list, target, loss_weights)
 
 			model_loss_list.append(float(model_loss.item())), ee_loss_list.append(ee_loss)
 			model_acc_list.append(model_acc), ee_acc_list.append(ee_acc)
@@ -99,8 +94,8 @@ def evalEEDNNs(model, val_loader, criterion, n_exits, epoch, device, loss_weight
 
 	avg_acc, avg_ee_acc = round(np.mean(model_acc_list), 2), np.mean(ee_acc_list, axis=0)
 
-	#logging.debug("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
-	print("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
+	logging.debug("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
+	#print("Epoch: %s, Val Model Loss: %s, Val Model Acc: %s"%(epoch, avg_loss, avg_acc))
 
 	result_dict = {"epoch": epoch, "val_loss": avg_loss, "val_acc": avg_acc}
 
@@ -120,11 +115,9 @@ def main(args):
 
 	os.makedirs(models_dir_path, exist_ok=True), os.makedirs(history_dir_path, exist_ok=True)
 
-	model_save_path = os.path.join(models_dir_path, "ee_model_%s_%s_branches_%s_id_%s.pth"%(args.model_name, 
-		args.n_branches, args.loss_weights_type, args.model_id))
+	model_save_path = os.path.join(models_dir_path, "ee_model_%s_%s_branches_id_%s.pth"%(args.model_name, args.n_branches, args.model_id))
 
-	history_path = os.path.join(history_dir_path, "history_ee_model_%s_%s_branches_%s_id_%s.csv"%(args.model_name, 
-		args.n_branches, args.loss_weights_type, args.model_id))
+	history_path = os.path.join(history_dir_path, "history_ee_model_%s_%s_branches_id_%s.csv"%(args.model_name, args.n_branches, args.model_id))
 
 	indices_path = os.path.join(config.DIR_PATH, "indices_%s.pt"%(args.dataset_name))
 
@@ -156,42 +149,27 @@ def main(args):
 	lr = [1.5e-4, 0.01]
 
 	criterion = nn.CrossEntropyLoss()
-	#criterion = nn.CrossEntropyLoss(label_smoothing=config.label_smoothing)
 
 	optimizer = optim.Adam([{'params': ee_model.stages.parameters(), 'lr': lr[0]}, 
 		{'params': ee_model.exits.parameters(), 'lr': lr[1]},
 		{'params': ee_model.classifier.parameters(), 'lr': lr[0]}], weight_decay=args.weight_decay)
 
-
-	main_lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
-	
-	#main_lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
-	#	T_max=config.max_epochs - config.lr_warmup_epochs, eta_min=config.lr_min)
-
-
-	#warmup_lr_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, 
-	#	start_factor=config.lr_warmup_decay, total_iters=config.lr_warmup_epochs)
-
-	#lr_scheduler = torch.optim.lr_scheduler.SequentialLR(optimizer, 
-	#	schedulers=[warmup_lr_scheduler, main_lr_scheduler], milestones=[config.lr_warmup_epochs])
-
-
+	#scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, 10, eta_min=0, last_epoch=-1, verbose=True)
 	n_exits = args.n_branches + 1
+
 	epoch, count_patience = 0, 0
 	best_val_loss = np.inf
 	df_history = pd.DataFrame()
 
 	while (count_patience < args.max_patience):
-	#while (epoch < config.max_epochs):
-		epoch += 1
+		count_patience += 1
 
 		train_result = trainEEDNNs(ee_model, train_loader, optimizer, criterion, n_exits, epoch, device, loss_weights)
 		val_result = evalEEDNNs(ee_model, val_loader, criterion, n_exits, epoch, device, loss_weights)
-		main_lr_scheduler.step()
+		#scheduler.step()
 
 		current_result.update(train_result), current_result.update(val_result)
-		#df_history = df_history.append(pd.Series(current_result), ignore_index=True)
-		df_history = pd.concat([df_history, pd.DataFrame([current_result])], ignore_index=True)
+		df_history = df_history.append(pd.Series(current_result), ignore_index=True)
 		df_history.to_csv(history_path)
 
 		if (val_result["val_loss"] < best_val_loss):
@@ -208,6 +186,8 @@ def main(args):
 			print("Current Patience: %s"%(count_patience))
 
 	print("Stop! Patience is finished")
+
+
 
 
 if (__name__ == "__main__"):
