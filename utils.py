@@ -3,9 +3,6 @@ from torchvision import datasets, transforms
 import torch, os, sys, requests
 #import early_exit_dnn, b_mobilenet, ee_nn
 import numpy as np
-from torchvision.transforms.functional import InterpolationMode
-#from torchvision.transforms import get_mixup_cutmix
-from torch.utils.data.dataloader import default_collate
 
 
 class ImageProcessor(object):
@@ -65,21 +62,17 @@ def get_indices(dataset, split_ratio, indices_path):
 
 def load_caltech256(args, dataset_path, indices_path):
 
-	#mean, std = [0.457342265910642, 0.4387686270106377, 0.4073427106250871], [0.26753769276329037, 0.2638145880487105, 0.2776826934044154]
-
-	mean, std = [0.485, 0.456, 0.406],[0.229, 0.224, 0.225]
+	mean, std = [0.457342265910642, 0.4387686270106377, 0.4073427106250871], [0.26753769276329037, 0.2638145880487105, 0.2776826934044154]
 
 	torch.manual_seed(args.seed)
-
-	interpolation = InterpolationMode(config.interpolation)
 
 	transformations_train = transforms.Compose([
 		transforms.Resize((args.input_dim, args.input_dim)),
 		transforms.RandomChoice([
 			transforms.ColorJitter(brightness=(0.80, 1.20)),
 			transforms.RandomGrayscale(p = 0.25)]),
-		transforms.CenterCrop((config.train_crop_size, config.train_crop_size)),
-		transforms.RandomHorizontalFlip(p=0.5),
+		transforms.CenterCrop((args.dim, args.dim)),
+		transforms.RandomHorizontalFlip(p=0.25),
 		transforms.RandomRotation(25),
 		transforms.ToTensor(), 
 		transforms.Normalize(mean = mean, std = std),
@@ -91,26 +84,6 @@ def load_caltech256(args, dataset_path, indices_path):
 		transforms.ToTensor(), 
 		transforms.Normalize(mean = mean, std = std),
 		])
-
-
-	#transformations_train = transforms.Compose([
-	#	transforms.RandomResizedCrop(config.train_crop_size, interpolation=interpolation, antialias=True),
-	#	transforms.RandomHorizontalFlip(p=config.hflip_prob),
-	#	transforms.TrivialAugmentWide(interpolation=interpolation),
-	#	transforms.ToTensor(),
-	#	transforms.Normalize(mean = mean, std = std),
-	#	transforms.RandomErasing(p=config.random_erase)])
-
-	#transformations_test = transforms.Compose([
-	#	transforms.Resize((config.val_resize_size, config.val_resize_size)),
-	#	transforms.CenterCrop((config.val_crop_size, config.val_crop_size)),
-	#	transforms.ToTensor(), 
-	#	transforms.Normalize(mean = mean, std = std),
-	#	])
-
-	#mixup_cutmix = get_mixup_cutmix(
-	#	mixup_alpha=config.mixup_alpha, cutmix_alpha=config.cutmix_alpha, num_categories=257)
-
 
 	# This block receives the dataset path and applies the transformation data. 
 	train_set = datasets.ImageFolder(dataset_path, transform=transformations_train)
@@ -124,10 +97,8 @@ def load_caltech256(args, dataset_path, indices_path):
 	test_data = torch.utils.data.Subset(test_set, indices=test_idx)
 
 	train_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size_train, 
-		shuffle=True, num_workers=config.ngpus, pin_memory=True, collate_fn=default_collate)
-	val_loader = torch.utils.data.DataLoader(val_data, batch_size=1, num_workers=config.ngpus, 
-		pin_memory=True, collate_fn=default_collate)
-	test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, num_workers=config.ngpus, 
-		pin_memory=True, collate_fn=default_collate)
+		shuffle=True, num_workers=4, pin_memory=True)
+	val_loader = torch.utils.data.DataLoader(val_data, batch_size=1, num_workers=4, pin_memory=True)
+	test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, num_workers=4, pin_memory=True)
 
 	return train_loader, val_loader, test_loader
