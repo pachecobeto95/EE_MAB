@@ -55,7 +55,7 @@ def extracting_ee_inference_data(args, test_loader, ee_model, n_branches, device
 
 def main(args):
 
-	n_classes = n_class_dict[args.dataset_name]
+	n_classes = config.n_class_dict[args.dataset_name]
 
 	device = torch.device('cuda' if (torch.cuda.is_available() and args.cuda) else 'cpu')
 
