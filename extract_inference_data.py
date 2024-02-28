@@ -72,7 +72,7 @@ def main(args):
 	inf_data_path = os.path.join(inf_data_dir_path, "inf_data_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, 
 		args.n_branches, args.loss_weights_type, args.model_id))
 	
-	ee_model = load_eednn_model(args, n_classes, model_path, device)
+	ee_model = utils.load_eednn_model(args, n_classes, model_path, device)
 
 	distortion_level_list = config.distortion_level_dict[args.distortion_type]
 
