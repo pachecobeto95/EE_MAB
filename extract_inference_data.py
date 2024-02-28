@@ -57,7 +57,7 @@ def main(args):
 
 	n_classes = config.n_class_dict[args.dataset_name]
 
-	device = torch.device('cuda' if (torch.cuda.is_available() and args.cuda) else 'cpu')
+	device = torch.device('cuda' if (torch.cuda.is_available() and args.use_gpu) else 'cpu')
 
 	models_dir_path = os.path.join(config.DIR_PATH, args.model_name, "models")
 
