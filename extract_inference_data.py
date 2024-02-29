@@ -7,7 +7,7 @@ import torch.nn as nn
 import pandas as pd
 
 
-def extracting_ee_inference_data(args, test_loader, ee_model, device, distortion_level):
+def extracting_ee_inference_data(args, test_loader, model, device, distortion_level):
 
 	n_exits = args.n_branches + 1	
 	conf_list, correct_list, delta_inf_time_list, cum_inf_time_list = [], [], [], []
