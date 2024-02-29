@@ -7,7 +7,7 @@ import torch.nn as nn
 import pandas as pd
 
 
-def extracting_ee_inference_data(args, test_loader, ee_model, n_branches, device, distortion_level):
+def extracting_ee_inference_data(args, test_loader, ee_model, device, distortion_level):
 
 	n_exits = args.n_branches + 1	
 	conf_list, correct_list, delta_inf_time_list, cum_inf_time_list = [], [], [], []
@@ -83,7 +83,7 @@ def main(args):
 
 		_, _, test_loader = utils.load_caltech256(args, dist_dataset_path, indices_path)
 
-		df_inf_data = extracting_ee_inference_data(args, test_loader, ee_model, n_branches, device, distortion_level)
+		df_inf_data = extracting_ee_inference_data(args, test_loader, ee_model, device, distortion_level)
 
 		df_inf_data.to_csv(inf_data_path, mode='a', header=not os.path.exists(inf_data_path))
 
