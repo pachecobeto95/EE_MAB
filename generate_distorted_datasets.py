@@ -29,6 +29,7 @@ class ImageProcessor(object):
 		except AttributeError as e:
 			# Handle the exception
 			print("An AttributeError occurred:", e)
+			pass
 
 	def save_distorted_image(self, output_path):
 		cv2.imwrite(output_path, self.dist_img)
