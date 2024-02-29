@@ -25,7 +25,6 @@ class ImageProcessor(object):
 		dist_name = getattr(self, self.distortion_type, self.distortion_not_found)
 		dist_name()
 
-
 	def save_distorted_image(self, output_path):
 		cv2.imwrite(output_path, self.dist_img)
 
