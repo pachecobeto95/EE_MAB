@@ -129,6 +129,9 @@ if (__name__ == "__main__"):
 	parser.add_argument('--distortion_type', type=str, help='Distoriton Type applyed in dataset.',
 		choices=list(config.distortion_level_dict.keys()))
 
+	#This argument defines the ratio to split the Traning Set, Val Set, and Test Set.
+	parser.add_argument('--split_ratio', type=float, default=config.split_ratio, help='Split Ratio')
+
 	args = parser.parse_args()
 
 	main(args)
