@@ -79,7 +79,7 @@ def main(args):
 	for distortion_level in distortion_level_list:
 		print("Distortion Type: %s, Distortion Level: %s"%(args.distortion_type, distortion_level))
 
-		dist_dataset_path = os.path.join(config.distorted_dataset_path, args.distortion_type, distortion_level)
+		dist_dataset_path = os.path.join(config.distorted_dataset_path, args.distortion_type, str(distortion_level))
 
 		_, _, test_loader = utils.load_caltech256(args, dist_dataset_path, indices_path)
 
