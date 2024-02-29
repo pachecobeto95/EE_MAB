@@ -21,15 +21,10 @@ class ImageProcessor(object):
 
 	def apply(self, image_path):
 
-		try:
-			self.image = cv2.imread(image_path)
-			dist_name = getattr(self, self.distortion_type, self.distortion_not_found)
-			dist_name()
+		self.image = cv2.imread(image_path)
+		dist_name = getattr(self, self.distortion_type, self.distortion_not_found)
+		dist_name()
 
-		except AttributeError as e:
-			# Handle the exception
-			print("An AttributeError occurred:", e)
-			pass
 
 	def save_distorted_image(self, output_path):
 		cv2.imwrite(output_path, self.dist_img)
