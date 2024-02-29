@@ -37,7 +37,9 @@ def generate_distorted_dataset(dataset_path, dist_type, dist_lvl, distorted_path
 
 		for filename in os.listdir(dir_class_path):
 			imgPath = os.path.join(dir_class_path, filename)
+			print(imgPath)
 			distorted_imgPath = os.path.join(dir_class_path, filename)
+			print(os.path.isfile(imgPath))
 			if (os.path.isfile(imgPath)):
 				try:
 					processor.apply(imgPath)
