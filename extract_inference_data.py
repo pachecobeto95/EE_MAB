@@ -23,7 +23,7 @@ def extracting_ee_inference_data(args, test_loader, model, device, distortion_le
 			# Obtain confs and predictions for each side branch.
 			_, conf_branches, predictions_branches, delta_inf_time_branches, cum_inf_time_branches = model.forwardTraining(data)
 
-			conf_list.append(confs), delta_inf_time_list.append(delta_inf_time_branches)
+			conf_list.append(conf_branches), delta_inf_time_list.append(delta_inf_time_branches)
 			cum_inf_time_list.append(cum_inf_time_branches)
 
 			correct_list.append([predictions_branches[i].eq(target.view_as(predictions_branches[i])).sum().item() for i in range(n_exits)])
