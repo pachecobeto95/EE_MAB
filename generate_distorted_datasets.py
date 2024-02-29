@@ -33,13 +33,11 @@ def generate_distorted_dataset(dataset_path, dist_type, dist_lvl, distorted_path
 
 	for class_name in tqdm(os.listdir(dataset_path)):
 		dir_class_path = os.path.join(dataset_path, class_name)
-		os.makedirs(dir_class_path, exist_ok=True)		
+		os.makedirs(dir_class_path)		
 
 		for filename in os.listdir(dir_class_path):
 			imgPath = os.path.join(dir_class_path, filename)
-			print(imgPath)
 			distorted_imgPath = os.path.join(dir_class_path, filename)
-			print(os.path.isfile(imgPath))
 			if (os.path.isfile(imgPath)):
 				try:
 					processor.apply(imgPath)
