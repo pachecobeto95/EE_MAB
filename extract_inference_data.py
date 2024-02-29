@@ -29,7 +29,7 @@ def extracting_ee_inference_data(args, test_loader, model, device, distortion_le
 			correct_list.append([predictions_branches[i].eq(target.view_as(predictions_branches[i])).sum().item() for i in range(n_exits)])
 			target_list.append(target.item()), prediction_list.append([predictions_branches[i].item() for i in range(n_exits)])
 
-	conf_list, correct_list, delta_inf_time_list = np.array(conf_list), np.array(correct_list), np.array(delta_inf_time_branches)
+	conf_list, correct_list, delta_inf_time_list = np.array(conf_list), np.array(correct_list), np.array(delta_inf_time_list)
 	cum_inf_time_list, prediction_list = np.array(cum_inf_time_list), np.array(prediction_list)
 
 	#accuracy_branches = [sum(correct_list[:, i])/len(correct_list[:, i]) for i in range(n_exits)]
