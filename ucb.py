@@ -2,7 +2,7 @@ import numpy as np
 import config
 
 class UCB(object):
-	def __init__(self, arms, c, n_rounds, reward_name, costs, overhead, arm_selection_way, alpha=2):
+	def __init__(self, arms, c, n_rounds, reward_name, overhead, arm_selection_way, alpha=2):
 		# Initialize the UCB class with required parameters.
 		# Arms: List of arms (thresholds) for the arms in the context of multi-armed bandit problem.
 		# c: Exploration parameter for UCB algorithm.
@@ -23,7 +23,7 @@ class UCB(object):
 		self.total_pulls = 0# Total number of pulls across all arms.
 		#self.ucb_implementation = ucb_implementation  # UCB implementation method.
 		self.reward_name = reward_name  # Name of the reward function.
-		self.costs = costs  # Costs associated with each arm.
+		#self.costs = costs  # Costs associated with each arm.
 		self.overhead = overhead# Overhead associated with decisions.
 		self.c = c  # Exploration parameter for UCB.
 		self.cumulative_regret = 0  # Cumulative regret over all rounds.

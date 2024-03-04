@@ -33,7 +33,6 @@ def main(args):
 
 
 
-
 if (__name__ == "__main__"):
 	# Input Arguments to configure the early-exit model .
 	parser = argparse.ArgumentParser(description="Extract the confidences obtained by DNN inference for next experiments.")
