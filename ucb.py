@@ -18,8 +18,8 @@ class UCB(object):
 		self.arms = arms
 		self.n_arms = len(arms)
 		self.n_rounds = n_rounds
-		self.total_rewards = np.zeros(n_arms)  # Total rewards accumulated for each arm.
-		self.n_pulls = np.zeros(n_arms) # Number of times each arm is pulled.
+		self.total_rewards = np.zeros(self.n_arms)  # Total rewards accumulated for each arm.
+		self.n_pulls = np.zeros(self.n_arms) # Number of times each arm is pulled.
 		self.total_pulls = 0# Total number of pulls across all arms.
 		#self.ucb_implementation = ucb_implementation  # UCB implementation method.
 		self.reward_name = reward_name  # Name of the reward function.
