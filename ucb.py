@@ -43,7 +43,7 @@ class UCB(object):
 		return row
 
 	# Function to extract information related to inference data.
-	def get_inf_data(self, row):
+	def get_inf_data(self, row, threshold):
 		conf_branch, conf_final = row.conf_branch_1.item(), row.conf_branch_2.item()
 		delta_conf = conf_final - conf_branch if(conf_final >= threshold) else max([conf_branch, conf_final]) - conf_branch
 		return conf_branch, conf_final, delta_conf
@@ -51,18 +51,19 @@ class UCB(object):
 	# Reward function: AdaEE basic.
 	def reward_adaee_basic(self, arm, row):
 		threshold = self.arms[arm]
-		conf_branch, conf_final, delta_conf = self.get_inf_data(row)
+		conf_branch, conf_final, delta_conf = self.get_inf_data(row, threshold)
 		return max(delta_conf, 0) - self.overhead if (conf_branch < threshold) else 0
 
 	# Reward function: AdaEE basic 2.
 	def reward_adaee_basic_2(self, arm, row):
 		threshold = self.arms[arm]
-		conf_branch, conf_final, delta_conf = self.get_inf_data(row)
+		conf_branch, conf_final, delta_conf = self.get_inf_data(row, threshold)
 		return delta_conf - self.overhead if (conf_branch < threshold) else 0
 
 	# Reward function: Alpha fairness.
 	def reward_alpha_fairness(self, arm, row):
-		_, _, delta_conf = self.get_inf_data(row)
+		threshold = self.arms[arm]
+		_, _, delta_conf = self.get_inf_data(row, threshold)
 		r = max(delta_conf, 0) - self.overhead
 		if(self.alpha == 1):
 			return np.log(r)
