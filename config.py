@@ -60,3 +60,6 @@ val_resize_size=232
 val_crop_size=224
 train_crop_size=176
 hflip_prob = 0.5
+
+
+fixed_threshold = 0.8
