@@ -29,7 +29,6 @@ def main(args):
 
 				df_data = df[(df.distortion_type == args.distortion_type) & (df.distortion_level == distortion_level)]
 
-				sys.exit()
 				mab = ucb.UCB(threshold_list, args.c, args.n_iter, args.reward_function, overhead, args.arm_selection_way)
 
 
