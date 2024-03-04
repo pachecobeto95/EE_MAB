@@ -89,8 +89,8 @@ class UCB(object):
 
 	# Function to check whether offloading is needed based on the selected arm and input data.
 	def check_offloading(self, arm, row):
-		conf_branch, conf_final, delta_conf = self.get_inf_data(row)
 		threshold = self.arms[arm]
+		conf_branch, conf_final, delta_conf = self.get_inf_data(row, threshold)
 		return 1 if (conf_branch < threshold) else 0
 
 	# Function to pull a specific arm based on input data.
@@ -175,6 +175,7 @@ class UCB(object):
 
 		# Start pulling arms based on selection strategy.
 		for n_round in range(self.n_arms, self.n_rounds):
+			print(n_round)
 			random_input = self.pick_random_input(df_data)
 			arm_to_pull = self.select_arm(n_round)
 			reward = self.pull_arm(arm_to_pull, random_input)
