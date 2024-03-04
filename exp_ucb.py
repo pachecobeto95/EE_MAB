@@ -31,7 +31,7 @@ def main(args):
 
 				mab = ucb.UCB(threshold_list, args.c, args.n_iter, args.reward_function, overhead, args.arm_selection_way)
 
-
+				results, performance_stats = mab.adaee(df_data)
 
 if (__name__ == "__main__"):
 	# Input Arguments to configure the early-exit model .
