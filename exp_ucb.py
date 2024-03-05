@@ -19,7 +19,7 @@ def main(args):
 		"inf_data_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
 
 	result_dir = os.path.join(config.DIR_PATH, args.model_name, "results")
-	os.makedirs(inf_data_dir_path, exist_ok=True)
+	os.makedirs(result_dir, exist_ok=True)
 
 	results_path = os.path.join(result_dir, "results_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
 	performance_stats_path = os.path.join(result_dir, "perfomance_stats_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
