@@ -62,4 +62,4 @@ train_crop_size=176
 hflip_prob = 0.5
 
 
-fixed_threshold = 0.8
+fixed_threshold = 0.6
