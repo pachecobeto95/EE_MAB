@@ -131,9 +131,9 @@ class UCB(object):
 
 	# Function for fixed threshold-based arm selection.
 	def fixed_threshold_selection(self, n_round):
-		arm_list = list(range(self.n_arms))
+		#arm_list = list(range(self.n_arms))
 		self.selected_arm_list[n_round] = round(config.fixed_threshold, 2)
-		return arm_list.index(config.fixed_threshold)
+		return self.arms.index(config.fixed_threshold)
 
 	# Function for last layer arm selection (not implemented in the provided code).
 	def last_layer_selection(self, n_round):
