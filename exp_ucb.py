@@ -28,7 +28,7 @@ def main(args):
 
 	df = pd.read_csv(inf_data_dir_path)
 
-	threshold_list = [0.6, 0.7, 0.8, 0.9, 1]
+	threshold_list = [0.8]
 	overhead_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
 	context = {"distortion_type": args.distortion_type}
