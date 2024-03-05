@@ -7,8 +7,8 @@ import ucb
 def saveResults(results, resultPath):
 
 	df = pd.DataFrame.from_dict(results)    
-    # Append the DataFrame to the existing CSV file
-    df.to_csv(resultPath, mode='a', header=False, index=False)
+	# Append the DataFrame to the existing CSV file
+	df.to_csv(resultPath, mode='a', header=False, index=False)
 
 
 
