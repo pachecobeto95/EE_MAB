@@ -28,18 +28,19 @@ def main(args):
 
 	df = pd.read_csv(inf_data_dir_path)
 
-	threshold_list = [0.8]
-	overhead_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
-
+	threshold_list = [0.6, 0.7, 0.8, 0.9, 1]
+	#overhead_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
+	overhead_list = [0]
+	
 	context = {"distortion_type": args.distortion_type}
 
-	for n_round in range(args.n_rounds):
+	for n_round in [0]:
 
 		df = df.sample(frac=1).reset_index(drop=True)
 
 		for overhead in overhead_list:
 
-			for distortion_level in distortion_level_list:
+			for distortion_level in [0]:
 				#print("Distortion Type: %s, Distortion Level: %s"%(args.distortion_type, distortion_level))
 				print(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")
 
