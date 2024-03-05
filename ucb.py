@@ -2,7 +2,7 @@ import numpy as np
 import config
 
 class UCB(object):
-	def __init__(self, arms, c, n_rounds, reward_name, overhead, arm_selection_way, alpha=2):
+	def __init__(self, arms, c, n_rounds, reward_name, overhead, arm_selection_way, context, alpha=2):
 		# Initialize the UCB class with required parameters.
 		# Arms: List of arms (thresholds) for the arms in the context of multi-armed bandit problem.
 		# c: Exploration parameter for UCB algorithm.
@@ -35,6 +35,7 @@ class UCB(object):
 		self.arm_selection_way = arm_selection_way# Method for selecting arms.
 		self.alpha = alpha# Alpha parameter for reward calculations.
 		self.total_offloading = 0 # Total offloading decisions made.
+		self.context = context
 
 	# Function to randomly select an input from the provided dataframe.
 	def pick_random_input(self, df):
@@ -190,12 +191,15 @@ class UCB(object):
 		offloading_prob = self.total_offloading / self.n_rounds
 
 		# Gather performance results.
-		performance_results = {"acc": acc, "overhead": self.overhead, "c": self.c, "offloading_prob": offloading_prob}
+		performance_results = {"acc": acc, "overhead": self.overhead, "c": self.c, "offloading_prob": offloading_prob,
+		"distortion_type": context["distortion_type"], "distortion_level": context["distortion_level"]}
 
 		# Gather other results for analysis.
 		results = {"selected_arm": self.selected_arm_list, "regret": self.inst_regret_list,
 		"overhead": [round(self.overhead, 2)] * self.n_rounds,
-		"cumulative_regret": self.cumulative_regret_list, "c": [self.c] * self.n_rounds}
+		"cumulative_regret": self.cumulative_regret_list, "c": [self.c] * self.n_rounds,
+		"distortion_type": self.n_rounds*[context["distortion_type"]],
+		"distortion_level": self.n_rounds*[context["distortion_level"]]}
 
 		return results, performance_results
 

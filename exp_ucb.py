@@ -1,8 +1,16 @@
-import argparse, logging, os, sys, config
+import argparse, logging, os, sys, config, utils
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
 import ucb
+
+def saveResults(results, resultPath):
+
+	df = pd.DataFrame.from_dict(results)    
+    # Append the DataFrame to the existing CSV file
+    df.to_csv(resultPath, mode='a', header=False, index=False)
+
+
 
 def main(args):
 
@@ -10,12 +18,20 @@ def main(args):
 	inf_data_dir_path = os.path.join(config.DIR_PATH, args.model_name, "inf_data",
 		"inf_data_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
 
+	result_dir = os.path.join(config.DIR_PATH, args.model_name, "results")
+	os.makedirs(inf_data_dir_path, exist_ok=True)
+
+	results_path = os.path.join(result_dir, "results_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
+	performance_stats_path = os.path.join(result_dir, "perfomance_stats_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
+
 	distortion_level_list = config.distortion_level_dict[args.distortion_type]
 
 	df = pd.read_csv(inf_data_dir_path)
 
 	threshold_list = [0.6, 0.7, 0.8, 0.9, 1]
 	overhead_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
+
+	context = {"distortion_type": args.distortion_type}
 
 	for n_round in range(args.n_rounds):
 
@@ -27,11 +43,19 @@ def main(args):
 				#print("Distortion Type: %s, Distortion Level: %s"%(args.distortion_type, distortion_level))
 				print(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")
 
+				context.update({"distortion_level": distortion_level})
+
 				df_data = df[(df.distortion_type == args.distortion_type) & (df.distortion_level == distortion_level)]
 
-				mab = ucb.UCB(threshold_list, args.c, args.n_iter, args.reward_function, overhead, args.arm_selection_way)
+				mab = ucb.UCB(threshold_list, args.c, args.n_iter, args.reward_function, overhead, args.arm_selection_way, 
+					context)
 
 				results, performance_stats = mab.adaee(df_data)
+
+				saveResults(results, resultPath)
+				saveResults(performance_stats, performance_stats_path)
+
+
 
 if (__name__ == "__main__"):
 	# Input Arguments to configure the early-exit model .
