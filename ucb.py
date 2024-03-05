@@ -192,14 +192,14 @@ class UCB(object):
 
 		# Gather performance results.
 		performance_results = {"acc": acc, "overhead": self.overhead, "c": self.c, "offloading_prob": offloading_prob,
-		"distortion_type": context["distortion_type"], "distortion_level": context["distortion_level"]}
+		"distortion_type": self.context["distortion_type"], "distortion_level": self.context["distortion_level"]}
 
 		# Gather other results for analysis.
 		results = {"selected_arm": self.selected_arm_list, "regret": self.inst_regret_list,
 		"overhead": [round(self.overhead, 2)] * self.n_rounds,
 		"cumulative_regret": self.cumulative_regret_list, "c": [self.c] * self.n_rounds,
-		"distortion_type": self.n_rounds*[context["distortion_type"]],
-		"distortion_level": self.n_rounds*[context["distortion_level"]]}
+		"distortion_type": self.n_rounds*[self.context["distortion_type"]],
+		"distortion_level": self.n_rounds*[self.context["distortion_level"]]}
 
 		return results, performance_results
 
