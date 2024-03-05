@@ -191,8 +191,8 @@ class UCB(object):
 		offloading_prob = self.total_offloading / self.n_rounds
 
 		# Gather performance results.
-		performance_results = {"acc": acc, "overhead": self.overhead, "c": self.c, "offloading_prob": offloading_prob,
-		"distortion_type": self.context["distortion_type"], "distortion_level": self.context["distortion_level"]}
+		performance_results = {"acc": [acc], "overhead": [self.overhead], "c": [self.c], "offloading_prob": [offloading_prob],
+		"distortion_type": [self.context["distortion_type"]], "distortion_level": [self.context["distortion_level"]]}
 
 		# Gather other results for analysis.
 		results = {"selected_arm": self.selected_arm_list, "regret": self.inst_regret_list,
