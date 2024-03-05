@@ -104,8 +104,9 @@ class UCB(object):
 		return reward
 
 	# Function to pull the optimal arm based on input data.
-	def pull_optimal_arm(self, input_data):
-		_, _, delta_conf = self.get_inf_data(input_data)
+	def pull_optimal_arm(self, arm, input_data):
+		threshold = self.arms[arm]
+		_, _, delta_conf = self.get_inf_data(input_data, threshold)
 		return max(0, delta_conf - self.overhead)
 
 	# Function to compute the Upper Confidence Bound (UCB) for a given arm.
@@ -179,7 +180,7 @@ class UCB(object):
 			random_input = self.pick_random_input(df_data)
 			arm_to_pull = self.select_arm(n_round)
 			reward = self.pull_arm(arm_to_pull, random_input)
-			optimal_reward = self.pull_optimal_arm(random_input)
+			optimal_reward = self.pull_optimal_arm(arm_to_pull, random_input)
 			self.compute_regret(reward, optimal_reward, n_round)
 			self.check_correct(random_input, arm_to_pull, n_round)
 			self.offloading_list[n_round] = self.offloading_flag
