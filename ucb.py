@@ -190,6 +190,8 @@ class UCB(object):
 		acc = sum(self.correct_list) / len(self.correct_list)
 		offloading_prob = self.total_offloading / self.n_rounds
 
+		print("Acc: %s"%(acc))
+
 		# Gather performance results.
 		performance_results = {"acc": [acc], "overhead": [self.overhead], "c": [self.c], "offloading_prob": [offloading_prob],
 		"distortion_type": [self.context["distortion_type"]], "distortion_level": [self.context["distortion_level"]]}
