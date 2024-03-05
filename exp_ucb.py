@@ -8,7 +8,7 @@ def saveResults(results, resultPath):
 
 	df = pd.DataFrame.from_dict(results)    
 	# Append the DataFrame to the existing CSV file
-	df.to_csv(resultPath, mode='a', index=False)
+	df.to_csv(resultPath, mode='a', header=not os.path.exists(resultPath))
 
 
 
