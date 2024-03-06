@@ -23,38 +23,45 @@ def main(args):
 
 	resultPath = os.path.join(result_dir, "results_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
 	performance_stats_path = os.path.join(result_dir, "perfomance_stats_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
+	logPath = os.path.join(result_dir, "log_ucb_ee_%s_%s_branches_%s_id_%s_selecting_arm_%s.csv"%(args.model_name, args.n_branches, 
+		args.loss_weights_type, args.model_id, args.arm_selection_way))
+
+	logging.basicConfig(filename=logPath, level=logging.INFO, format='%(asctime)s - %(message)s')
 
 	distortion_level_list = config.distortion_level_dict[args.distortion_type]
 
 	df = pd.read_csv(inf_data_dir_path)
 
 	threshold_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-	#overhead_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
-	overhead_list = [0.1]
-	
+	overhead_list = [0, 0.2, 0.4, 0.6, 0.8, 1]
+
 	context = {"distortion_type": args.distortion_type}
 
-	for n_round in [0]:
+	c_list = [0.1, 0.5, 1, 1.5, 2, 2.5] if (args.arm_selection_way == "ucb") else [None]
 
-		df = df.sample(frac=1).reset_index(drop=True)
+	for c in c_list:
 
-		for overhead in overhead_list:
+		for n_round in args.n_rounds:
 
-			for distortion_level in [0]:
-				#print("Distortion Type: %s, Distortion Level: %s"%(args.distortion_type, distortion_level))
-				print(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")
+			df = df.sample(frac=1).reset_index(drop=True)
 
-				context.update({"distortion_level": distortion_level})
+			for overhead in overhead_list:
 
-				df_data = df[(df.distortion_type == args.distortion_type) & (df.distortion_level == distortion_level)]
+				for distortion_level in distortion_level_list:
+					#print(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")
+					logging.info(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")					
 
-				mab = ucb.UCB(threshold_list, args.c, args.n_iter, args.reward_function, overhead, args.arm_selection_way, 
-					context)
+					context.update({"distortion_level": distortion_level})
 
-				results, performance_stats = mab.adaee(df_data)
+					df_data = df[(df.distortion_type == args.distortion_type) & (df.distortion_level == distortion_level)]
 
-				saveResults(results, resultPath)
-				saveResults(performance_stats, performance_stats_path)
+					mab = ucb.UCB(threshold_list, c, args.n_iter, args.reward_function, overhead, args.arm_selection_way, 
+						context, args.fixed_threshold)
+
+					results, performance_stats = mab.adaee(df_data)
+
+					saveResults(results, resultPath)
+					saveResults(performance_stats, performance_stats_path)
 
 
 
@@ -89,14 +96,16 @@ if (__name__ == "__main__"):
 
 	parser.add_argument('--n_iter', type=int, help='Number of iterations of UCB.')
 
-	parser.add_argument('--c', type=int, help='Exploration and Exploitation ratio.')
+	#parser.add_argument('--c', type=int, help='Exploration and Exploitation ratio.')
 
 	#parser.add_argument('--ucb_implementation', type=str, default="adaee", help='ucb_implementation.')
 
 	parser.add_argument('--reward_function', type=str, help='Reward Function.')
 
-	parser.add_argument('--arm_selection_way', type=str, help='Arm selection way.')
+	parser.add_argument('--arm_selection_way', type=str, choices=["ucb", "random", "fixed_threshold"], 
+		help='Arm selection way.')
 
+	parser.add_argument('--fixed_threshold', type=float, help='Fixed Threshold.')
 
 	args = parser.parse_args()
 

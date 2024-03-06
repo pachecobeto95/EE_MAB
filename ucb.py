@@ -1,5 +1,5 @@
 import numpy as np
-import config
+import config, logging
 
 
 class UCB(object):
@@ -26,7 +26,7 @@ class UCB(object):
 		self.reward_name = reward_name  # Name of the reward function.
 		#self.costs = costs  # Costs associated with each arm.
 		self.overhead = overhead# Overhead associated with decisions.
-		self.c = c  # Exploration parameter for UCB.
+		self.c = c  # Exploration-exploitation parameter for UCB.
 		self.cumulative_regret = 0  # Cumulative regret over all rounds.
 		self.cumulative_regret_list = np.zeros(n_rounds)  # List to store cumulative regret for each round.
 		self.inst_regret_list = np.zeros(n_rounds)# List to store instantaneous regret for each round.
@@ -37,6 +37,9 @@ class UCB(object):
 		self.alpha = alpha# Alpha parameter for reward calculations.
 		self.total_offloading = 0 # Total offloading decisions made.
 		self.context = context
+		self.inf_time_list = np.zeros(n_rounds)
+		self.fixed_threshold = fixed_threshold
+
 
 	# Function to randomly select an input from the provided dataframe.
 	def pick_random_input(self, df):
@@ -98,8 +101,8 @@ class UCB(object):
 	# Function to pull a specific arm based on input data.
 	def pull_arm(self, arm, input_data):
 		reward = self.compute_reward(arm, input_data)
-		self.offloading_flag = self.check_offloading(arm, input_data)
-		self.total_offloading += self.offloading_flag
+		#self.offloading_flag = self.check_offloading(arm, input_data)
+		#self.total_offloading += self.offloading_flag
 		self.total_rewards[arm] += reward
 		self.n_pulls[arm] += 1
 		self.total_pulls += 1
@@ -133,8 +136,8 @@ class UCB(object):
 	# Function for fixed threshold-based arm selection.
 	def fixed_threshold_selection(self, n_round):
 		#arm_list = list(range(self.n_arms))
-		self.selected_arm_list[n_round] = round(config.fixed_threshold, 2)
-		return self.arms.index(config.fixed_threshold)
+		self.selected_arm_list[n_round] = round(self.fixed_threshold, 2)
+		return self.arms.index(self.fixed_threshold)
 
 	# Function for last layer arm selection (not implemented in the provided code).
 	def last_layer_selection(self, n_round):
@@ -152,21 +155,32 @@ class UCB(object):
 		self.cumulative_regret_list[n_round] = self.cumulative_regret
 		self.inst_regret_list[n_round] = round(inst_regret, 5)
 
-	# Function to check correctness of decision made.
-	def check_correct(self, row, arm, n_round):
+	# Function to check correctness of decision made and the inference time.
+	def compute_stats(self, row, arm, n_round):
 		conf_branch, conf_final = row.conf_branch_1.item(), row.conf_branch_2.item()
 		threshold = self.arms[arm]
+
 		if(conf_branch >= threshold):
 			correct = row.correct_branch_1.item()
+			inference_time = row.cum_inf_time_branch_1.item()
+			offloading_flag = 0
 		else:
+			inference_time = row.cum_inf_time_branch_2.item()
+			offloading_flag = 1
+
 			if(conf_final >= threshold):
 				correct = row.correct_branch_2.item()
+
 			else:
 				conf_branches = [conf_branch, conf_final]
 				correct_branches = [row.correct_branch_1.item(), row.correct_branch_2.item()]
 				correct = correct_branches[np.argmax(conf_branches)]
-		
+					
+
+
 		self.correct_list[n_round] = correct
+		self.inf_time_list[n_round] = inference_time
+		self.offloading_list[n_round] = offloading_flag
 
 	# Main function implementing the AdaEE algorithm.
 	def adaee(self, df_data):
@@ -178,34 +192,40 @@ class UCB(object):
 
 		# Start pulling arms based on selection strategy.
 		for n_round in range(self.n_arms, self.n_rounds):
-			print(n_round)
+
 			random_input = self.pick_random_input(df_data)
 			arm_to_pull = self.select_arm(n_round)
 			reward = self.pull_arm(arm_to_pull, random_input)
 			optimal_reward = self.pull_optimal_arm(arm_to_pull, random_input)
 			self.compute_regret(reward, optimal_reward, n_round)
-			self.check_correct(random_input, arm_to_pull, n_round)
-			self.offloading_list[n_round] = self.offloading_flag
+			self.compute_stats(random_input, arm_to_pull, n_round)
+			#self.compute_inference_time(random_input, arm_to_pull, n_round)
+			#self.offloading_list[n_round] = self.offloading_flag
 
 		# Calculate accuracy and offloading probability.
 		acc = sum(self.correct_list) / len(self.correct_list)
+		avg_inf_time, std_inf_time = np.mean(self.inf_time_list), np.std(self.inf_time_list)
 		offloading_prob = self.total_offloading / self.n_rounds
 
 		item, contagem = np.unique(self.selected_arm_list, return_counts=True)
 
-		print("Acc: %s"%(acc))
-		print("Most selected Arm: %s"%(item[np.argmax(contagem)]))
+		logging.info("Acc: %s, Inf Time: %s, Most selected arm: %s"%(acc, avg_inf_time, item[np.argmax()]))
+		#print("Most selected Arm: %s"%(item[np.argmax()]))
 
 		# Gather performance results.
 		performance_results = {"acc": [acc], "overhead": [self.overhead], "c": [self.c], "offloading_prob": [offloading_prob],
-		"distortion_type": [self.context["distortion_type"]], "distortion_level": [self.context["distortion_level"]]}
+		"distortion_type": [self.context["distortion_type"]], "distortion_level": [self.context["distortion_level"]],
+		"arm_selection_way": [self.arm_selection_way], "reward_function": [self.reward_name],
+		"avg_inf_time": avg_inf_time, "std_inf_time": std_inf_time}
 
 		# Gather other results for analysis.
 		results = {"selected_arm": self.selected_arm_list, "regret": self.inst_regret_list,
 		"overhead": [round(self.overhead, 2)] * self.n_rounds,
 		"cumulative_regret": self.cumulative_regret_list, "c": [self.c] * self.n_rounds,
 		"distortion_type": self.n_rounds*[self.context["distortion_type"]],
-		"distortion_level": self.n_rounds*[self.context["distortion_level"]]}
+		"distortion_level": self.n_rounds*[self.context["distortion_level"]],
+		"arm_selection_way": self.n_rounds*[self.arm_selection_way], "reward_function": self.n_rounds*[self.reward_name],
+		"inf_time": self.inf_time_list}
 
 		return results, performance_results
 
