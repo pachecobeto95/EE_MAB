@@ -1,6 +1,7 @@
 import numpy as np
 import config
 
+
 class UCB(object):
 	def __init__(self, arms, c, n_rounds, reward_name, overhead, arm_selection_way, context, alpha=2):
 		# Initialize the UCB class with required parameters.
@@ -190,7 +191,10 @@ class UCB(object):
 		acc = sum(self.correct_list) / len(self.correct_list)
 		offloading_prob = self.total_offloading / self.n_rounds
 
+		item, contagem = np.unique(self.selected_arm_list, return_counts=True)
+
 		print("Acc: %s"%(acc))
+		print("Most selected Arm: %s"%(item[np.argmax(contagem)]))
 
 		# Gather performance results.
 		performance_results = {"acc": [acc], "overhead": [self.overhead], "c": [self.c], "offloading_prob": [offloading_prob],
