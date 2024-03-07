@@ -41,7 +41,7 @@ def main(args):
 
 	for c in c_list:
 
-		for n_round in args.n_rounds:
+		for n_round in range(args.n_rounds):
 
 			df = df.sample(frac=1).reset_index(drop=True)
 
