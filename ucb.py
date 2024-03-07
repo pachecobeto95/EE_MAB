@@ -3,7 +3,7 @@ import config, logging
 
 
 class UCB(object):
-	def __init__(self, arms, c, n_rounds, reward_name, overhead, arm_selection_way, context, alpha=2):
+	def __init__(self, arms, c, n_rounds, reward_name, overhead, arm_selection_way, context, fixed_threshold, alpha=2):
 		# Initialize the UCB class with required parameters.
 		# Arms: List of arms (thresholds) for the arms in the context of multi-armed bandit problem.
 		# c: Exploration parameter for UCB algorithm.
