@@ -1,5 +1,5 @@
-import argparse, logging, os, sys, config, utils
-from tqdm import tqdm
+import argparse, logging, os, sys, config
+#from tqdm import tqdm
 import numpy as np
 import pandas as pd
 import ucb
@@ -39,29 +39,34 @@ def main(args):
 
 	c_list = [0.1, 0.5, 1, 1.5, 2, 2.5] if (args.arm_selection_way == "ucb") else [None]
 
-	for c in c_list:
+	alpha_list = [0.5, 0.8, 1, 1.2, 1.5, 2] if (args.reward_function == "alpha_fairness") else [None]
 
-		for n_round in range(args.n_rounds):
+	for alpha in alpha_list:
 
-			df = df.sample(frac=1).reset_index(drop=True)
+		for c in c_list:
 
-			for overhead in overhead_list:
+			for n_round in range(args.n_rounds):
 
-				for distortion_level in distortion_level_list:
-					#print(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")
-					logging.info(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")					
+				df = df.sample(frac=1).reset_index(drop=True)
 
-					context.update({"distortion_level": distortion_level})
+				for overhead in overhead_list:
 
-					df_data = df[(df.distortion_type == args.distortion_type) & (df.distortion_level == distortion_level)]
+					for distortion_level in distortion_level_list:
+						#print(f"Distortion Type: {args.distortion_type}, Distortion Level: {distortion_level}")
+						logging.info("Distortion Type: %s, Distortion Level: %s, c: %s, Round: %s, Overhead: %s, Alpha: %s"%(args.distortion_type,
+							distortion_level, c, n_round, overhead, alpha))
 
-					mab = ucb.UCB(threshold_list, c, args.n_iter, args.reward_function, overhead, args.arm_selection_way, 
-						context, args.fixed_threshold)
+						context.update({"distortion_level": distortion_level})
 
-					results, performance_stats = mab.adaee(df_data)
+						df_data = df[(df.distortion_type == args.distortion_type) & (df.distortion_level == distortion_level)]
 
-					saveResults(results, resultPath)
-					saveResults(performance_stats, performance_stats_path)
+						mab = ucb.UCB(threshold_list, c, args.n_iter, args.reward_function, overhead, args.arm_selection_way, 
+							context, args.fixed_threshold, alpha)
+
+						results, performance_stats = mab.adaee(df_data)
+
+						saveResults(results, resultPath)
+						saveResults(performance_stats, performance_stats_path)
 
 
 
