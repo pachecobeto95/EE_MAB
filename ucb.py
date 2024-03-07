@@ -209,7 +209,7 @@ class UCB(object):
 
 		item, contagem = np.unique(self.selected_arm_list, return_counts=True)
 
-		logging.info("Acc: %s, Inf Time: %s, Most selected arm: %s"%(acc, avg_inf_time, item[np.argmax()]))
+		logging.info("Acc: %s, Inf Time: %s, Most selected arm: %s"%(acc, avg_inf_time, item[np.argmax(contagem)]))
 		#print("Most selected Arm: %s"%(item[np.argmax()]))
 
 		# Gather performance results.
