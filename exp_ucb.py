@@ -21,9 +21,9 @@ def main(args):
 	result_dir = os.path.join(config.DIR_PATH, args.model_name, "results")
 	os.makedirs(result_dir, exist_ok=True)
 
-	resultPath = os.path.join(result_dir, "results_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
-	performance_stats_path = os.path.join(result_dir, "perfomance_stats_ucb_ee_%s_%s_branches_%s_id_%s.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
-	logPath = os.path.join(result_dir, "log_ucb_ee_%s_%s_branches_%s_id_%s_selecting_arm_%s.csv"%(args.model_name, args.n_branches, 
+	resultPath = os.path.join(result_dir, "results_ucb_ee_%s_%s_branches_%s_id_%s_5m_rounds.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
+	performance_stats_path = os.path.join(result_dir, "perfomance_stats_ucb_ee_%s_%s_branches_%s_id_%s_5m_rounds.csv"%(args.model_name, args.n_branches, args.loss_weights_type, args.model_id))
+	logPath = os.path.join(result_dir, "log_ucb_ee_%s_%s_branches_%s_id_%s_selecting_arm_%s_5m_rounds.csv"%(args.model_name, args.n_branches, 
 		args.loss_weights_type, args.model_id, args.arm_selection_way))
 
 	logging.basicConfig(filename=logPath, level=logging.INFO, format='%(asctime)s - %(message)s')
